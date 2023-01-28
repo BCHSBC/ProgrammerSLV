@@ -1,64 +1,55 @@
+#include <unordered_map>
 #include <string>
 #include <vector>
 #include <algorithm>
 #include <set>
-#include <map>
-//#include <iostream>
 using namespace std;
-map <string,vector<string>> m;
-map <string,int> IDX;
-set <string> s;
+unordered_map<string, vector<string>> m;
+unordered_map<string, int> IDX;
+set<string> s;
 bool check[10];
-map <string,int> check2;
-bool isFit(string a,string b){
-    bool flag = false;
-    if(a.length() != b.length()) return flag;
-    for(int i = 0;i<a.length();i++){
-        if(a[i] == b[i] || b[i] == '*'){
-            flag = true;
-        }else{
+unordered_map<string, int> check2;
+
+bool isFit(string a, string b) {
+    if (a.length() != b.length()) return false;
+    for (int i = 0; i < a.length(); i++) {
+        if (a[i] != b[i] && b[i] != '*')
             return false;
-        }
     }
-    return flag;
+    return true;
 }
-void SLV(int cnt,vector<string>& banned_id,vector<int> v){
-    if(cnt == banned_id.size()){
-        sort(v.begin(),v.end());
+
+void SLV(int cnt, vector<string>& banned_id, vector<int> v) {
+    if (cnt == banned_id.size()) {
+        sort(v.begin(), v.end());
         string str = "";
-        for(int i = 0;i<v.size();i++){
-            str += to_string(v[i]);
-        }
+        for (int i : v) str += to_string(i);
         s.insert(str);
-        //cout << str <<"\n";
-        return ;
+        return;
     }
-    for(int i = 0;i<m[banned_id[cnt]].size();i++){
-        int node = IDX[m[banned_id[cnt]][i]];
-        if(!check[node]){
+    for (string& id : m[banned_id[cnt]]) {
+        int node = IDX[id];
+        if (!check[node]) {
             check[node] = true;
             v.push_back(node);
-            SLV(cnt+1,banned_id,v);
+            SLV(cnt + 1, banned_id, v);
             check[node] = false;
             v.pop_back();
         }
     }
 }
+
 int solution(vector<string> user_id, vector<string> banned_id) {
-    int answer = 0;
-    for(int i = 0;i<user_id.size();i++){
-        IDX[user_id[i]] = i;
-    }
-    for(int i = 0;i<banned_id.size();i++){
-        if(check2[banned_id[i]] != 0) continue;
-        for(int j = 0;j<user_id.size();j++){
-            if(isFit(user_id[j],banned_id[i])){
-                check2[banned_id[i]] = 1;
-                m[banned_id[i]].push_back(user_id[j]);
+    for (int i = 0; i < user_id.size(); i++) IDX[user_id[i]] = i;
+    for (string& id : banned_id) {
+        if (!check2[id]) {
+            check2[id] = 1;
+            for (string& uid : user_id) {
+                if (isFit(uid, id)) m[id].push_back(uid);
             }
         }
     }
     vector<int> v;
-    SLV(0,banned_id,v);
+    SLV(0, banned_id, v);
     return s.size();
 }
