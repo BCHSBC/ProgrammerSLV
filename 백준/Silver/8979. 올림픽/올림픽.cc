@@ -27,7 +27,7 @@ int main(){
     sort(v.begin(),v.end(),comp);
     int rank = 1;
     int dup = 0;
-    int last = 1;
+    int last = 0;
     for(int i = 0;i<v.size()-1;i++){
         vector <int> cur = v[i];
         if(cur[0] == k){
